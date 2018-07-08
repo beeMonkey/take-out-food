@@ -4,7 +4,8 @@ function bestCharge(selectedItems) {
   const ItemsCount = calItemsCount(selectedItems)
   const cartItems = buildcartItems(ItemsCount, loadAllItems())
   const cartItemsWith_subtotal = calsubtotal(cartItems)
-  console.log(cartItemsWith_subtotal)
+  const cartItemsWith_subtotal_total = caltotal(cartItemsWith_subtotal)
+  //console.log(cartItemsWith_subtotal_total)
 }
 
 function calItemsCount(selectedItems) {
@@ -29,14 +30,24 @@ function buildcartItems(ItemsCount, loadAllItems) {   //在进行map操作的时
 function calsubtotal(cartItems) {
   return cartItems.map((cartItem) => {
     const subtotal = cartItem.price * cartItem.count
-    cartItem.subtotal=subtotal
+    cartItem.subtotal = subtotal
     return cartItem
   })
 }
-
-//bestCharge(selectedItems)
+function caltotal(cartItemsWith_subtotal) {
+  let total = 0;
+  cartItemsWith_subtotal.forEach((cartItem_subtotal) => {
+    total += cartItem_subtotal.subtotal;
+  })
+  return {
+    cartItemsWith_subtotal,
+    total
+  }
+}
+bestCharge(selectedItems)
 module.exports = {
   calItemsCount,
   buildcartItems,
-  calsubtotal
+  calsubtotal,
+  caltotal
 }
