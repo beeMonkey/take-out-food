@@ -1,13 +1,31 @@
 const { loadAllItems } = require('./items.js')
-let selectedItems = ["ITEM0001 x 1", "ITEM0013 x 2", "ITEM0022 x 1"];
+//const selectedItems = ["ITEM0001 x 1", "ITEM0013 x 2", "ITEM0022 x 1"];
+const selectedItems = ["ITEM0013 x 4", "ITEM0022 x 1"]
+//const selectedItems = ["ITEM0013 x 4"];
+const { loadPromotions } = require('./promotions.js')
+const promotions = loadPromotions()
+const promotionItemId = loadPromotions()[1].items;
 function bestCharge(selectedItems) {
   const ItemsCount = calItemsCount(selectedItems)
   const cartItems = buildcartItems(ItemsCount, loadAllItems())
   const cartItemsWith_subtotal = calsubtotal(cartItems)
-  const cartItemsWith_subtotal_total = caltotal(cartItemsWith_subtotal)
+  const total = caltotal(cartItemsWith_subtotal)
   //console.log(cartItemsWith_subtotal_total)
-}
+  const promotion1Total = calpromotion1Total(total)
+  const item2 = gethalfPriceItems(cartItemsWith_subtotal, promotionItemId)
+  const promotion2Total = calpromotion2Total(cartItemsWith_subtotal, promotionItemId, total)
+  //const promotion=chooseWhichPromotion(cartItemsWith_subtotal,promotionItemId,total)
+  //const result=lastTotal(total,promotion)
+  //const lasttotal=lastTotal(total,promotion1Total,promotion2Total)
 
+  const model = generateModel(promotions, total, promotion1Total, promotion2Total)
+  generateReceipt(cartItemsWith_subtotal, model)
+  //console.log(total)
+  //console.log(promotion2Total)
+  //console.log(lasttotal)
+  // console.log(promotion2Total)
+  console.log(model)
+}
 function calItemsCount(selectedItems) {
   return selectedItems.map((selectedItem) => {
     let [id, count] = selectedItem.split(' x ')
@@ -39,12 +57,97 @@ function caltotal(cartItemsWith_subtotal) {
   cartItemsWith_subtotal.forEach((cartItem_subtotal) => {
     total += cartItem_subtotal.subtotal;
   })
-  return {
-    cartItemsWith_subtotal,
-    total
+  // return {
+  //   cartItemsWith_subtotal,
+  //   total
+  // }
+  return total
+}
+function calpromotion1Total(total) {
+  return (total >= 30) ? (total - 6) : total
+}
+function calpromotion2Total(cartItemsWith_subtotal, promotionItemId, total) {
+  const halfPriceItems = gethalfPriceItems(cartItemsWith_subtotal, promotionItemId)
+  const halfPriceSaved = calhalfPriceSaved(halfPriceItems)
+  return total - halfPriceSaved
+}
+function gethalfPriceItems(cartItemsWith_subtotal, promotionItemId) {
+  return promotionItemId.map((itemId) => {
+    const promotion2Item = cartItemsWith_subtotal.find((cartItem) => {
+      return itemId === cartItem.id
+    })
+    return promotion2Item;
+  })
+}
+
+function calhalfPriceSaved(halfPriceItems) {
+  let halfPriceSaved = 0
+  halfPriceItems.forEach((halfPriceItem) => {
+    if (halfPriceItem !== undefined) {
+      halfPriceSaved += halfPriceItem.price / 2 * halfPriceItem.count
+    }
+  })
+  return halfPriceSaved
+}
+// function chooseWhichPromotion(cartItemsWith_subtotal,promotionItemId,total){
+//   let halfPriceItems=gethalfPriceItems(cartItemsWith_subtotal,promotionItemId)
+//   for (let halfPriceItem of halfPriceItems){
+//     if(halfPriceItem!==undefined){
+//       var promotion2Total=calpromotion2Total(cartItemsWith_subtotal,promotionItemId)
+//       //console.log(promotion2Total)
+//       break;
+//     }
+//   }
+//   if(total>=30){
+//     var promotion1Total=calpromotion1Total(total)
+//   }
+//   return (promotion2Total<=promotion1Total)?promotion2Total:promotion1Total
+// }
+function lastTotal(total, promotion1Total, promotion2Total) {
+  if ((total - promotion2Total) > 6) {
+    return promotion2Total
+  } else if (total > 30) {
+    return promotion1Total
+  } else {
+    return total
   }
 }
+function generateModel(promotions, total, promotion1Total, promotion2Total) {
+  if ((total - promotion2Total) > 6) {
+    return {
+      type: promotions[1].type,
+      saved: total - promotion2Total,
+      total: promotion2Total
+    }
+  } else if (total > 30) {
+    return {
+      type: promotions[0].type,
+      saved: total - promotion1Total,
+      total: promotion1Total
+    }
+  } else {
+    return {
+      type: '',
+      saved: '',
+      total
+    }
+  }
+}
+
+function generateReceipt(cartItemsWith_subtotal, model) {
+  console.log(cartItemsWith_subtotal)
+  let content = `============== 订餐明细 =============`
+  let items=''
+  for (let item of cartItemsWith_subtotal) {
+     items+='\n'
+     items+= `${item.name} x ${item.count} = ${item.subtotal}元`
+  }
+
+
+  console.log(items)
+}
 bestCharge(selectedItems)
+
 module.exports = {
   calItemsCount,
   buildcartItems,
