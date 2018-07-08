@@ -1,6 +1,6 @@
 const { loadAllItems } = require('./items.js')
-//const selectedItems = ["ITEM0001 x 1", "ITEM0013 x 2", "ITEM0022 x 1"];
-const selectedItems = ["ITEM0013 x 4", "ITEM0022 x 1"]
+const selectedItems = ["ITEM0001 x 1", "ITEM0013 x 2", "ITEM0022 x 1"];
+//const selectedItems = ["ITEM0013 x 4", "ITEM0022 x 1"]
 //const selectedItems = ["ITEM0013 x 4"];
 const { loadPromotions } = require('./promotions.js')
 const promotions = loadPromotions()
@@ -19,12 +19,14 @@ function bestCharge(selectedItems) {
   //const lasttotal=lastTotal(total,promotion1Total,promotion2Total)
 
   const model = generateModel(promotions, total, promotion1Total, promotion2Total)
-  generateReceipt(cartItemsWith_subtotal, model)
+  const receipt = generateReceipt(cartItemsWith_subtotal, model)
   //console.log(total)
   //console.log(promotion2Total)
   //console.log(lasttotal)
   // console.log(promotion2Total)
-  console.log(model)
+  //console.log(model)
+  console.log(receipt)
+  return receipt
 }
 function calItemsCount(selectedItems) {
   return selectedItems.map((selectedItem) => {
@@ -117,13 +119,15 @@ function generateModel(promotions, total, promotion1Total, promotion2Total) {
     return {
       type: promotions[1].type,
       saved: total - promotion2Total,
-      total: promotion2Total
+      total: promotion2Total,
+      whichitem:'(黄焖鸡，凉皮)'
     }
   } else if (total > 30) {
     return {
       type: promotions[0].type,
       saved: total - promotion1Total,
-      total: promotion1Total
+      total: promotion1Total,
+      whichitem:''
     }
   } else {
     return {
@@ -135,16 +139,26 @@ function generateModel(promotions, total, promotion1Total, promotion2Total) {
 }
 
 function generateReceipt(cartItemsWith_subtotal, model) {
-  console.log(cartItemsWith_subtotal)
-  let content = `============== 订餐明细 =============`
-  let items=''
+  //console.log(cartItemsWith_subtotal)
+  if(model.type===''){
+    model.whichitem=''
+  }
+  let items =`============= 订餐明细 =============`
+   let show=`\n-----------------------------------
+使用优惠:
+${model.type}${model.whichitem}，省${model.saved}元`
+
+if(model.type==='')show='';
+
   for (let item of cartItemsWith_subtotal) {
      items+='\n'
      items+= `${item.name} x ${item.count} = ${item.subtotal}元`
   }
-
-
-  console.log(items)
+  items=items+show+`
+-----------------------------------
+总计：${model.total}元
+===================================`
+  return items
 }
 bestCharge(selectedItems)
 
@@ -152,5 +166,6 @@ module.exports = {
   calItemsCount,
   buildcartItems,
   calsubtotal,
-  caltotal
+  caltotal,
+  bestCharge
 }
