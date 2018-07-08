@@ -10,21 +10,11 @@ function bestCharge(selectedItems) {
   const cartItems = buildcartItems(ItemsCount, loadAllItems())
   const cartItemsWith_subtotal = calsubtotal(cartItems)
   const total = caltotal(cartItemsWith_subtotal)
-  //console.log(cartItemsWith_subtotal_total)
   const promotion1Total = calpromotion1Total(total)
-  const item2 = gethalfPriceItems(cartItemsWith_subtotal, promotionItemId)
+  //const item2 = gethalfPriceItems(cartItemsWith_subtotal, promotionItemId)
   const promotion2Total = calpromotion2Total(cartItemsWith_subtotal, promotionItemId, total)
-  //const promotion=chooseWhichPromotion(cartItemsWith_subtotal,promotionItemId,total)
-  //const result=lastTotal(total,promotion)
-  //const lasttotal=lastTotal(total,promotion1Total,promotion2Total)
-
   const model = generateModel(promotions, total, promotion1Total, promotion2Total)
   const receipt = generateReceipt(cartItemsWith_subtotal, model)
-  //console.log(total)
-  //console.log(promotion2Total)
-  //console.log(lasttotal)
-  // console.log(promotion2Total)
-  //console.log(model)
   console.log(receipt)
   return receipt
 }
@@ -105,15 +95,15 @@ function calhalfPriceSaved(halfPriceItems) {
 //   }
 //   return (promotion2Total<=promotion1Total)?promotion2Total:promotion1Total
 // }
-function lastTotal(total, promotion1Total, promotion2Total) {
-  if ((total - promotion2Total) > 6) {
-    return promotion2Total
-  } else if (total > 30) {
-    return promotion1Total
-  } else {
-    return total
-  }
-}
+// function lastTotal(total, promotion1Total, promotion2Total) {
+//   if ((total - promotion2Total) > 6) {
+//     return promotion2Total
+//   } else if (total > 30) {
+//     return promotion1Total
+//   } else {
+//     return total
+//   }
+// }
 function generateModel(promotions, total, promotion1Total, promotion2Total) {
   if ((total - promotion2Total) > 6) {
     return {

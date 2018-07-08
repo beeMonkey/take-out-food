@@ -1,9 +1,3 @@
-1.take out application,order
-2.Item Count Promotion=>Charge
-3.Promotions =>most saved
-4.Item,Count =>bestCharge()=> Summary
-
-#最开始的思路
 #1 calItemsCount()
 i: selectedItems[String]
 
@@ -36,63 +30,29 @@ o:cartItemsWith_subtotal[{
 #4 calTotal()
 i:cartItemsWith_subtotal
 
-o:cartItemsWith_subtotal_total{
-    cartItems:[{
-        id:String,
-        name:String,price:Number,
-        count:Number,
-        subtotal:Number,
-    }], 
-    total:Number
-    }
+o:total:Number
 
 #5 calPromotion1()
-i:cartItemsWith_subtotal_total,promotion1
+i:  cartItemsWith_subtotal_total,promotion1
 
-o: cartItemsWith_subtotal_total_promotion1:[{
-        id:String,
-        name:String,price:Number,
-        count:Number,
-        subtotal:Number,
-    }], 
-    promotion1:String+Number(total-6)
-    total:Number
-    }
+o: promotin1Total:Number
 
 #6 calPromotion2()===>取得半价菜品，计算 
-                      #61gethalfPriceItems()
-                      #62calHalfPrice     
+                      #61 gethalfPriceItems()
+                      #62 calHalfPrice()     
 i:cartItemsWith_subtotal_total,promotion2
 
-o: cartItemsWith_subtotal_total_promotion2:[{
-        id:String,
-        name:String,price:Number,
-        count:Number,
-        subtotal:Number,
-    }], 
-    promotion2:String+Number
-    total:Number
-    }
-#7 selectedPromotion()
-i:cartItemsWith_subtotal_total,cartItemsWith_subtotal_total_promotion1,cartItemsWith_subtotal_total_promotion2
+o: promotion2Total
+#7 generateModel()
+i:promotions[{type:string,items:[String]}], total, promotion1Total, promotion2Total
 
-o:  cartItemsWith_subtotal_total || cartItemsWith_subtotal_total_promotion1 ||cartItemsWith_subtotal_total_promotion2
+o:  {type:String,saved:Number,total:Number}
 
 #8 generateReceipt()
-i:cartItemsWith_subtotal,loadPromotion(),total,promotion1Total,promotion2Total
+i:cartItemsWith_subtotal, model
 
-o:
-#N  view=>model
-i:
+o:receipt:String
 
-o:
-model:{
-    receiptItem[{name:String,count:Number,subtotal:Number}],
-    promotin:String+Number,
-    total:Number
-}
-
-#N+1  model =>view
 
 
 
